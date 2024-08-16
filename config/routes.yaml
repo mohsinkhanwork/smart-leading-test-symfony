@@ -3,3 +3,15 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+
+product:
+    resource: ../src/Controller/ProductController.php
+    type: annotation
+
+category:
+    resource: ../src/Controller/CategoryController.php
+    type: annotation
+
+type:
+    resource: ../src/Controller/TypeController.php
+    type: annotation
