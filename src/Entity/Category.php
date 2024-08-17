@@ -21,8 +21,9 @@ class Category
     #[Groups(['category:read'])]
     private ?string $name = null;
 
-    
+
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: Product::class)]
+    
     private Collection $products;
 
     public function __construct()

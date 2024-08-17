@@ -11,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 
 #[Route('/api/product')]
 class ProductController extends AbstractController
@@ -19,7 +20,7 @@ class ProductController extends AbstractController
     public function index(ProductRepository $productRepository): JsonResponse
     {
         $products = $productRepository->findAll();
-        return $this->json($products);
+        return $this->json($products, 200, [], ['groups' => 'product:read']);
     }
 
     #[Route('/{id}', name: 'product_show', methods: ['GET'])]
@@ -29,7 +30,7 @@ class ProductController extends AbstractController
     }
 
     #[Route('/new', name: 'product_new', methods: ['POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, CategoryRepository $categoryRepository, TypeRepository $typeRepository): JsonResponse
+    public function new(Request $request, EntityManagerInterface $entityManager, CategoryRepository $categoryRepository, TypeRepository $typeRepository, SerializerInterface $serializer): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -48,10 +49,10 @@ class ProductController extends AbstractController
             $entityManager->persist($product);
             $entityManager->flush();
 
-            return $this->json($product, 201);
+            $json = $serializer->serialize($product, 'json', ['groups' => 'product:read']);
         }
 
-        return $this->json(['error' => 'Invalid category or type'], 400);
+        return new JsonResponse($json, 201, [], true);
     }
 
     #[Route('/{id}/edit', name: 'product_edit', methods: ['PUT'])]
