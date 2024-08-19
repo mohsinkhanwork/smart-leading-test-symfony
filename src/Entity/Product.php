@@ -31,11 +31,11 @@ class Product
     private ?string $description = null;
 
     #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'products')]
-    #[Groups(['product:read'])]
+    #[Groups(['product:read', 'category:read'])]
     private ?Category $category = null;
 
     #[ORM\ManyToOne(targetEntity: Type::class, inversedBy: 'products')]
-    #[Groups(['product:read'])]
+    #[Groups(['product:read', 'type:read'])]
     private ?Type $type = null;
 
     public function getId(): ?int

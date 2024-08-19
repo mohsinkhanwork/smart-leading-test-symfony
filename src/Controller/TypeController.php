@@ -18,7 +18,7 @@ class TypeController extends AbstractController
     public function index(TypeRepository $typeRepository): JsonResponse
     {
         $types = $typeRepository->findAll();
-        return $this->json($types);
+        return $this->json($types, 200, [], ['groups' => 'type:read']);
     }
 
     #[Route('/new', name: 'type_new', methods: ['POST'])]
@@ -67,6 +67,7 @@ class TypeController extends AbstractController
         $log->setAction($action);
         $log->setEntity($entity);
         $log->setEntityId($entityId);
+        $log->setTimestamp(new \DateTime());
 
         $entityManager->persist($log);
         $entityManager->flush();

@@ -67,6 +67,7 @@ class CategoryController extends AbstractController
         $log->setAction($action);
         $log->setEntity($entity);
         $log->setEntityId($entityId);
+        $log->setTimestamp(new \DateTime());
 
         $entityManager->persist($log);
         $entityManager->flush();
