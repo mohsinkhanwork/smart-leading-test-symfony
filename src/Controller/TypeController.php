@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Type;
+use App\Entity\Log;
 use App\Repository\TypeRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -31,6 +32,8 @@ class TypeController extends AbstractController
         $entityManager->persist($type);
         $entityManager->flush();
 
+        $this->logAction('create', 'type', $type->getId(), $entityManager);
+
         return $this->json($type, 201);
     }
 
@@ -42,6 +45,8 @@ class TypeController extends AbstractController
         $type->setName($data['name']);
         $entityManager->flush();
 
+        $this->logAction('update', 'type', $type->getId(), $entityManager);
+
         return $this->json($type);
     }
 
@@ -51,6 +56,19 @@ class TypeController extends AbstractController
         $entityManager->remove($type);
         $entityManager->flush();
 
+        $this->logAction('delete', 'type', $type->getId(), $entityManager);
+
         return $this->json(['message' => 'Type deleted successfully']);
+    }
+
+    private function logAction(string $action, string $entity, int $entityId, EntityManagerInterface $entityManager): void
+    {
+        $log = new Log();
+        $log->setAction($action);
+        $log->setEntity($entity);
+        $log->setEntityId($entityId);
+
+        $entityManager->persist($log);
+        $entityManager->flush();
     }
 }

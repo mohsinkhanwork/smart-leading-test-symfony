@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Category;
+use App\Entity\Log;
 use App\Repository\CategoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -31,6 +32,8 @@ class CategoryController extends AbstractController
         $entityManager->persist($category);
         $entityManager->flush();
 
+        $this->logAction('create', 'category', $category->getId(), $entityManager);
+
         return $this->json($category, 201);
     }
 
@@ -42,6 +45,8 @@ class CategoryController extends AbstractController
         $category->setName($data['name']);
         $entityManager->flush();
 
+        $this->logAction('update', 'category', $category->getId(), $entityManager);
+
         return $this->json($category);
     }
 
@@ -51,6 +56,19 @@ class CategoryController extends AbstractController
         $entityManager->remove($category);
         $entityManager->flush();
 
+        $this->logAction('delete', 'category', $category->getId(), $entityManager);
+
         return $this->json(['message' => 'Category deleted successfully']);
+    }
+
+    private function logAction(string $action, string $entity, int $entityId, EntityManagerInterface $entityManager): void
+    {
+        $log = new Log();
+        $log->setAction($action);
+        $log->setEntity($entity);
+        $log->setEntityId($entityId);
+
+        $entityManager->persist($log);
+        $entityManager->flush();
     }
 }

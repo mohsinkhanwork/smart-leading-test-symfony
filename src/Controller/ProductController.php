@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Product;
+use App\Entity\Log;
 use App\Repository\CategoryRepository;
 use App\Repository\ProductRepository;
 use App\Repository\TypeRepository;
@@ -49,6 +50,8 @@ class ProductController extends AbstractController
             $entityManager->persist($product);
             $entityManager->flush();
 
+            $this->logAction('create', 'product', $product->getId(), $entityManager);
+
             $json = $serializer->serialize($product, 'json', ['groups' => 'product:read']);
         }
 
@@ -73,6 +76,8 @@ class ProductController extends AbstractController
 
             $entityManager->flush();
 
+            $this->logAction('update', 'product', $product->getId(), $entityManager);
+
             return $this->json($product);
         }
 
@@ -85,6 +90,20 @@ class ProductController extends AbstractController
         $entityManager->remove($product);
         $entityManager->flush();
 
+        $this->logAction('delete', 'product', $product->getId(), $entityManager);
+
         return $this->json(['message' => 'Product deleted successfully']);
+    }
+
+    private function logAction(string $action, string $entity, int $entityId, EntityManagerInterface $entityManager): void
+    {
+        $log = new Log();
+        $log->setAction($action);
+        $log->setEntity($entity);
+        $log->setEntityId($entityId);
+        $log->setTimestamp(new \DateTime());
+
+        $entityManager->persist($log);
+        $entityManager->flush();
     }
 }
